@@ -4,6 +4,9 @@ import com.example.bookmanagement.model.Book;
 import com.example.bookmanagement.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +32,12 @@ import java.util.List;
 
     // DELETE /api/books/{id} - Remove a book
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        bookService.deleteBook(id);
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        if(bookService.checkById(id)) {
+            bookService.deleteBook(id);
+            return ResponseEntity.ok("Book deleted successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Book id: " + id + " not found");
+        }
     }
 }
